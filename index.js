@@ -47,10 +47,20 @@ export default {
             return new Response(JSON.stringify({ message: "Specified subdomain is not allowed." }), { status: 401 });
 
         const headers = new Headers(request.headers);
+        const roblosecurityHeader = headers.get("x-roblosecurity");
+        const roblosecurityBase64Header = headers.get("x-roblosecurity-base64");
         headers.delete("host");
         headers.delete("roblox-id");
         headers.delete("user-agent");
+        headers.delete("x-roblosecurity");
+        headers.delete("x-roblosecurity-base64");
         headers["user-agent"] = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36";
+
+        if (roblosecurityBase64Header) {
+            headers.set("cookie", `.ROBLOSECURITY=${atob(roblosecurityBase64Header)}`);
+        } else if (roblosecurityHeader) {
+            headers.set("cookie", `.ROBLOSECURITY=${roblosecurityHeader}`);
+        }
 
 
         const init = {
